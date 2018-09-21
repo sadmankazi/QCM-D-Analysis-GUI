@@ -1,0 +1,449 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+\paragraph_spacing onehalf
+\noindent
+QCM-D data analysis GUI mini guide.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+Kazi Sadman
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+Shull Research Group
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+Northwestern University, Evanston, IL- 60208
+\end_layout
+
+\begin_layout Section
+\paragraph_spacing onehalf
+\noindent
+Buttons
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Load QCM-D Data:
+\series default
+ This button opens a file selection window for you to navigate to your data.
+ Your data should be in the format shown in the example files, where the
+ appropriate referencing for the shifts is already done manually.
+ The code assumes you have referenced your shifts with respect to the bare
+ crystal if your film is in air, or to the bare crystal in water if your
+ film is in water.
+ For a bulk measurement of a viscous liquid, the reference is the bare crystal
+ in air.
+ The code will read only excel files with the extension .xlsx.
+ If you have a .xls file, simply changing the extension to .xlsx should make
+ things work.
+ Note the dissipation factor is used in the data, but a conversion is made
+ to represent this as 
+\begin_inset Formula $\Delta\Gamma$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Bulk Calculation:
+\series default
+ If you are measuring a bulk viscous liquid, then load your data and hit
+ this button.
+ A pop up figure will appear with your solutions.
+ Here you can use the 'bare crystal in water' file as an example to see
+ the properties of water at different harmonics.
+ The bulkcalc_Callback function near the end of the main code is called,
+ and you can make changes to the plots here according to your needs.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Plot QCM Data:
+\series default
+ This file will plot the solutions for your film in water or your film in
+ air.
+ Make sure the correct radio button is selected for your situation.
+ Note 
+\begin_inset Formula $dp$
+\end_inset
+
+ is written in 
+\begin_inset Formula $mg/m^{2}$
+\end_inset
+
+ which is approximately the film thickness in nanometers is a density of
+ 
+\begin_inset Formula $1g/cm^{3}$
+\end_inset
+
+ is assumed.
+ Likewise the 
+\begin_inset Formula $\rho|G_{3}^{*}|$
+\end_inset
+
+ is the complex shear modulus at 15 MHz.
+ This quantity is 
+\begin_inset Formula $\approx10^{5}Pa-g/cm^{3}$
+\end_inset
+
+ for water, and 
+\begin_inset Formula $\approx3*10^{9}$
+\end_inset
+
+ for polymer glasses.
+ The phase angle 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is 90 for a Newtonian liquid like water, and 
+\begin_inset Formula $\approx1^{o}$
+\end_inset
+
+ for an elastic solid like a polymer glass.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Viscoelastic plots:
+\series default
+ This button will show you the viscoelastic plots outside the main GUI.
+ The export_callback near the end of the main code is used to make these
+ plots.
+ You can change the way things are plotted here to customize for your publicatio
+n needs.
+ Only results for the 3:5,5 calculation are shown.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Thickness plots: 
+\series default
+This button will show you the 
+\begin_inset Formula $d/\lambda_{n}$
+\end_inset
+
+ and also the predicted shifts from your solutions.
+ In this analysis, we exclusively only use the 3:5,5 calculation, therefore
+ we have 
+\begin_inset Formula $\Delta\Gamma_{3}$
+\end_inset
+
+ as a free parameter for a consistency check.
+ If the code solved correctly, then 
+\begin_inset Formula $\Delta f_{3},\Delta f_{5}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Delta\Gamma_{5}$
+\end_inset
+
+ (3:5,5) should all have the experimental shifts and predicted shifts match
+ exactly.
+ The difference in the experimental and predicted value of 
+\begin_inset Formula $\Delta\Gamma_{3}$
+\end_inset
+
+ should be as small as possible.
+ In most real cases a small discrepancy in the predicted and experimentl
+ value is acceptable.
+ Here, the thicknessplots_Callback near the end of the main code is called
+ to make the plots.
+ You can customize the output according to your needs.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Refresh: 
+\series default
+Relaunches the GUI and clears the memory.
+ Useful if an error is encountered, or if you just want a clean new window.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Range to solve:
+\series default
+ By default we solve every point.
+ However, if the data set is large then it is desirable to solve only a
+ portion of the data with larger intervals.
+ For example, inputting 100:5:500 into the edit text boxes will solve every
+ fifth point between the 100th and 500th data points.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Save plots:
+\series default
+ If this button is checked, then publication quality vector figures are
+ exported into the working directory when 'Viscoelastic Plots' and 'Thickness
+ Plots' are clicked.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Export Data:
+\series default
+ this button outputs a tab delimited text file into the working directory
+ with all the relevant values.
+ This is useful if you want to do your own plotting outside MATLAB.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Handles:
+\series default
+ This allows you access into MATLAB's handle structure where all the data
+ is stored internally.
+ After you have solved for solutions, click this button and MATLAB will
+ open the workspace in debugging mode.
+ Here, there will be a new variable called 
+\begin_inset Quotes eld
+\end_inset
+
+Handles
+\begin_inset Quotes erd
+\end_inset
+
+ in the workspace.
+ If you double click this, then the internal data structure is repealed.
+ For example, the variable phiout{1} stores all the phase angles from the
+ 3:5:3 calculation, and phiout{2} stores all 
+\begin_inset Formula $\phi$
+\end_inset
+
+ from the 3:5,5 calculation.
+ Likewise, the variable d5out stores 
+\begin_inset Formula $d/\lambda_{5}$
+\end_inset
+
+.
+ To leave the handle structure, click 
+\begin_inset Quotes eld
+\end_inset
+
+Quit Debugging
+\begin_inset Quotes erd
+\end_inset
+
+ in the main MATLAB window.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+
+\series bold
+Shift Simulator:
+\series default
+ See the section on shift simulator.
+ 
+\end_layout
+
+\begin_layout Section*
+\paragraph_spacing onehalf
+\noindent
+General Notes: 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+1) The code is pretty good at finding missing values if some of your data
+ is missing.
+ However, sometimes if there are missing values in the time column, then
+ the code will crash.
+ You have to manually delete those rows.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+2) The GUI has zoom, grab and data cursor functionality enabled.
+ You can select the data cursor, and then click on individual points for
+ the exact values.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+3) Often, if the shifts do not solve (maybe because your film is too thin),
+ then the calculation will return non-sense for modulus and 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+ For example, all the 
+\begin_inset Formula $\phi$
+\end_inset
+
+ will be 90, which is the upper bound on the numerical solver.
+ However, even if the code does not solve because your film is too thin,
+ the 
+\begin_inset Formula $d\rho$
+\end_inset
+
+ value is reliable.
+ 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+4) See figure 6a in Anal.
+ Chem.
+ 2018, 90, 4079−4088 to gain intuition on how 
+\begin_inset Formula $\phi$
+\end_inset
+
+ and 
+\begin_inset Formula $\rho|G_{n}^{*}|$
+\end_inset
+
+ are correlated.
+ See Figure 8a to understand the approximate thickness ranges needed for
+ accurate viscoelastic analysis.
+ In general, the stiffer the material, the thicker it has to be for being
+ in the optimal viscoelastic regime.
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
+\noindent
+5) The code is written in MATLAB 2018a.
+ Version specific errors may occur, especially if you are on a much older
+ version.
+ Generally, 2015a and up should work fine.
+\end_layout
+
+\end_body
+\end_document

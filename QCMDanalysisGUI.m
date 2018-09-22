@@ -1,8 +1,11 @@
 function varargout = QCMDanalysisGUI(varargin)
 
-% Copyright (C) 2016 Kazi Sadman (Shull Research Group, Northwestern Uni.)
+% Copyright (C) 2018 Kazi Sadman (Shull Research Group, Northwestern Uni.)
 %
-% This is Version 3.3 of the GUI "BOB."
+% This is Version 1 of the GUI "QCMDanalysisGUI"
+% Source code: https://github.com/sadmankazi/QCM-D-Analysis-GUI
+% See READ ME for referencing and citation recommendations
+% Bug reporting should be done through GitHub
 %
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -125,37 +128,24 @@ guidata(hObject, handles)
 
 data = xlsread(fullpathname);
 
-% Following few lines clean the data by getting rid of NaNs
-b = find(~isnan(data(:,1))); %Indices of all elements in time that are NOT NaN
+%Delete any missing data in the matrix:
+[row, col] = find(isnan(data));
+data(row, :) = [];
 
-handles.t = data(b,1);
-handles.delf{1} = data(b,2);
-handles.delg{1} = data(b,3);
+%Import data into the handle structure:
+handles.t = data(:,1)./60; %Convert seconds to min
+handles.delf{1} = data(:,2);
+handles.delg{1} = 0.5*1*5*data(:,3);
 
-handles.delf{3} = data(b,4);
-handles.delg{3} = data(b,5);
+handles.delf{3} = data(:,4);
+handles.delg{3} = 0.5*3*5*data(:,5);
 
-handles.delf{5} = data(b,6);
-handles.delg{5} = data(b,7);
+handles.delf{5} = data(:,6);
+handles.delg{5} = 0.5*5*5*data(:,7);
+%handles.temp = data(:,8);  Import new variables here if (temperature for
+%example), put these data into the 8th, 9th columns...
 
-% now find indices of all NaNs in the shifts
-first = find(isnan(data(b,2)));
-third = find(isnan(data(b,4)));
-fifth = find(isnan(data(b,6)));
-
-b = b(~ismember(b,first));
-b = b(~ismember(b,third));
-b = b(~ismember(b,fifth));
-
-handles.t = handles.t(b)./60;  % Convert to min
-handles.delf{1} = handles.delf{1}(b);
-handles.delf{3} = handles.delf{3}(b);
-handles.delf{5} = handles.delf{5}(b);
-handles.delg{1} = 0.5*1*5*handles.delg{1}(b);
-handles.delg{3} = 0.5*3*5*handles.delg{3}(b);
-handles.delg{5} = 0.5*5*5*handles.delg{5}(b);
-
-set(handles.endindex,'String',num2str(length(b)));
+set(handles.endindex,'String',num2str(length(handles.t)));
 endidx = str2num(get(handles.endindex,'String'));
 
 plot(handles.axes4,  handles.t, handles.delf{3}./3,'o',...
@@ -173,7 +163,7 @@ xlabel(handles.axes6,'t (min)','fontweight','bold');
 xlim(handles.axes6,[0 handles.t(endidx)]);
 linkaxes([handles.axes4,handles.axes6],'x');
 
-set(handles.statusupdate, 'String', 'QCM Data loaded!','Foregroundcolor',[0 0.5 0]);
+set(handles.statusupdate, 'String', 'QCM-D Data loaded!','Foregroundcolor',[0 0.5 0]);
 
 guidata(hObject,handles)
 
@@ -182,6 +172,12 @@ function plotqcmdata_Callback(hObject, eventdata, handles)
 
 if ~isfield(handles,'filename')
     set(handles.statusupdate, 'String', 'Load QCM data first!','Foregroundcolor','red');
+    return
+end
+
+%Check if shifts are liekly in the bulk regime or not:
+if -handles.delf{1} < handles.delg{1}
+    set(handles.statusupdate, 'String', 'Shifts not in thin-film limit! Try Bulk.','Foregroundcolor','red');
     return
 end
 
@@ -253,20 +249,20 @@ for i = 1:i
         fdissratio=@(d1,phi,drho) -imag(delfstar2layer(nh{i}(3),d1,phi,drho))/(real(delfstar2layer(nh{i}(3),d1,phi,drho)));
         fharmratio=@(d1,phi,drho) real(delfstar2layer(nh{i}(2),d1,phi,drho))/(real(delfstar2layer(nh{i}(1),d1,phi,drho)));
         
-        if get(handles.onelayer,'value')==0
+         if get(handles.twolayer,'value')==1
             f3tosolve=@(x) [fharmratio(x(1),x(2),x(3))-handles.eharmratio(k);...
                 fdissratio(x(1),x(2),x(3))-handles.edissratio(k);...
                 100*(drhocalc(ndrho, handles.delf{ndrho}(k),x(1),x(2),x(3))-x(3))];  %multiply by 100 to get enough accuracy
             inputsoln= soln;                               % Dynamic guesses for solving, i.e., previous solution is new initial guess
         elseif get(handles.onelayer,'value')==1
-            f3tosolve=@(x) [fharmratio(x(1),x(2))-handles.eharmratio(k);...
-                fdissratio(x(1),x(2))-handles.edissratio(k)];
+            f3tosolve=@(x) [fharmratio(x(1),x(2),0)-handles.eharmratio(k);...
+                fdissratio(x(1),x(2),0)-handles.edissratio(k)];
             soln=soln(1:2);  % [not sure d1/lam/ phase angle] These are the initial guesses for d1/lam, phi and drho.
             inputsoln= soln;
         end
-        
-        try
-            if get(handles.onelayer,'value')==0
+                
+        try 
+            if get(handles.twolayer,'value')==1
                 [soln,error]=lsqnonlin(f3tosolve,inputsoln,lb,ub,options);
             elseif get(handles.onelayer,'value')==1
                 [soln,error]=lsqnonlin(f3tosolve,inputsoln(1:2),lb(1:2),ub(1:2),options);
@@ -287,6 +283,7 @@ for i = 1:i
         
     end
 end
+
 set(handles.statusupdate, 'String', 'Solved!','Foregroundcolor',[0 0.5 0]);
 
 % In case the we don't solve for every point, delete the ones which weren't
@@ -325,9 +322,9 @@ f5pred = (2.*5.*f1^2).*(handles.drhoout{2}.*(real(delfstar2layer(5, handles.d1ou
 g5pred = (2.*5.*f1^2).*(handles.drhoout{2}.*(imag(delfstar2layer(5, handles.d1out{2}, handles.phiout{2}, handles.drhoout{2}))./zq));
 
 % Viscoelastic Plots
-plot(handles.axes14, repmat(handles.t(start:step:endidx),1,2), 1e6*cell2mat(handles.drhoout')', '+');
-plot(handles.axes10, repmat(handles.t(start:step:endidx),1,2), 0.001*cell2mat(handles.grho3out')', '+'); %Multiply 0.001 to convert from Pa*kg/m^3 to Pa*g/cm^3
-plot(handles.axes11, repmat(handles.t(start:step:endidx),1,2), cell2mat(handles.phiout')', '+');
+plot(handles.axes14, handles.t(start:step:endidx), 1e6*handles.drhoout{2}, '+');
+plot(handles.axes10, handles.t(start:step:endidx), 0.001*handles.grho3out{2}, '+'); %Multiply 0.001 to convert from Pa*kg/m^3 to Pa*g/cm^3
+plot(handles.axes11, handles.t(start:step:endidx), handles.phiout{2}, '+');
 % set(handles.axes11, 'YLim', [0 90])
 
 % Harmonic Plots
@@ -363,7 +360,7 @@ xlim(handles.axes6,[handles.t(start) handles.t(endidx)])
 xlabel(handles.axes14,'t (min)','fontweight','bold');
 ylabel(handles.axes14,'\Delta M_A (mg/m^2)','fontweight','bold');
 xlim(handles.axes14,[handles.t(start) handles.t(endidx)])
-legend(handles.axes14,'353','355','location','best');
+legend(handles.axes14,'355','location','best');
 
 ylabel(handles.axes10,'\rho |G*_3| (Pa-g/cm^3)','fontweight','bold');
 xlabel(handles.axes10,'t (min)','fontweight','bold');
@@ -420,7 +417,6 @@ function onelayer_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of onelayer
-
 
 
 function endindex_Callback(hObject, eventdata, handles)
@@ -512,14 +508,18 @@ if ~isfield(handles,'d1out')
     return
 end
 
+s = str2num(get(handles.startindex,'String'));
+st = str2num(get(handles.stepindex,'String'));
+e = str2num(get(handles.endindex,'String'));
+
 header={'time (min)','delf1 (Hz)','delg1 (Hz)','delf3','delg3','delf5','delg5',...
     'dp (mg/m2)','rhoG_3 (Pa-g/cm3)','phi (deg)','d/lambda_3','d/lambda_5',...
-    'decay length_3 (um)','decay length_5 (um)','pd/(pd)_s3'};
+    'decay length_3 (um)','decay length_5 (um)','pd/(pd)_s3','delf3pred','delg3pred','delf5pred','delg5pred'};
 
-A = [handles.t handles.delf{1} handles.delg{1} handles.delf{3} handles.delg{3}...
-    handles.delf{5} handles.delg{5} 1e6*handles.drhoout{2}' 1e3*handles.grho3out{2}'...
+A = [handles.t(s:st:e) handles.delf{1}(s:st:e) handles.delg{1}(s:st:e) handles.delf{3}(s:st:e) handles.delg{3}(s:st:e)...
+    handles.delf{5}(s:st:e) handles.delg{5}(s:st:e) 1e6*handles.drhoout{2}' 0.001*handles.grho3out{2}'...
     handles.phiout{2}' handles.d3out' handles.d5out' 1e3*handles.rhodel3out' 1e3*handles.rhodel5out'...
-    (-1./handles.sauerbreycorrection3)'];
+    (-1./handles.sauerbreycorrection3)' handles.f3pred' handles.g3pred' handles.f5pred' handles.g5pred'];
 
 fileID = fopen('exported_data.txt','w');
 fprintf(fileID, '%s\t', header{:});
@@ -531,13 +531,13 @@ dlmwrite('exported_data.txt',A,'delimiter','\t','-append','roffset',1)
 function bulkcalc_Callback(hObject, eventdata, handles)
 
 % Calculates pG and phi for bulk liquid measurements
-%Check is any file is actually loaded: 
+%Check is any file is actually loaded:
 if ~isfield(handles,'filename')
     set(handles.statusupdate, 'String', 'No QCM data loaded!','Foregroundcolor','red');
     return
 end
 
-%Check if shifts are liekly in the bulk regime or not: 
+%Check if shifts are liekly in the bulk regime or not:
 if -handles.delf{1} > handles.delg{1}+100
     set(handles.statusupdate, 'String', 'Shifts not in the bulk limit!','Foregroundcolor','red');
     return
@@ -714,6 +714,3 @@ if get(handles.saveplots,'value')==1
     saveas(calcprops,'viscoelastic plots.svg')
 else
 end
-
-
-

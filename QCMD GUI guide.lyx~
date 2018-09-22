@@ -680,14 +680,6 @@ literal "false"
 \begin_layout Standard
 9) To understand the kinds of experiments which can be performed using the
  QCM, the reader is referred to several publications.
-\begin_inset CommandInset citation
-LatexCommand cite
-key "martin_anodic_2016,sturdy_quantitative_2016,sadman_influence_2017,sadman_ph-controlled_2017,yeh_oxygen_2018"
-literal "false"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section

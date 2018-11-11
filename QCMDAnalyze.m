@@ -135,7 +135,7 @@ data(row, :) = [];
 %Import data into the handle structure:
 handles.t = data(:,1)./60; %Convert seconds to min
 handles.delf{1} = data(:,2);
-handles.delg{1} = 0.5*1*5*data(:,3);
+handles.delg{1} = 0.5*1*5*data(:,3); %Convert D to Gamma
 
 handles.delf{3} = data(:,4);
 handles.delg{3} = 0.5*3*5*data(:,5);
@@ -164,6 +164,10 @@ xlim(handles.axes6,[0 handles.t(endidx)]);
 linkaxes([handles.axes4,handles.axes6],'x');
 
 set(handles.statusupdate, 'String', 'QCM-D Data loaded!','Foregroundcolor',[0 0.5 0]);
+
+cla(handles.axes14)
+cla(handles.axes10)
+cla(handles.axes11)
 
 guidata(hObject,handles)
 
@@ -226,8 +230,8 @@ delfstar2layer=@(n,d1,phi,drho) delfstardn(Dn(n,d1,phi),Rliq(n,drho));
 drhocalc=@(n,df,d1,phi,drho) df.*(zq./(2*n*f1^2))./real(delfstar2layer(n,d1,phi,drho));
 rhodelta=@(n,grho,phi) ((grho.^0.5)./(2*pi.*n.*f1.*sind(phi./2)));
 
-soln=[0.05, 45, 0.001];  % [not sure d1/lam/ phase angle/ Drho] These are the initial guesses for d1/lam, phi and drho.
-lb=[0.01, 0, 2e-4];      % lower bounds on final solution
+soln=[0.05, 40, 0.001];  % [not sure d1/lam/ phase angle/ Drho] These are the initial guesses for d1/lam, phi and drho.
+lb=[0.01, 0, 1e-4];      % lower bounds on final solution
 ub=[0.25, 90, 0.01];     % upper bounds on final solution
 
 inputsoln= soln;
@@ -259,12 +263,12 @@ for i = 1:i
             f3tosolve=@(x) [fharmratio(x(1),x(2),x(3))-handles.eharmratio(k);...
                 fdissratio(x(1),x(2),x(3))-handles.edissratio(k);...
                 100*(drhocalc(ndrho, handles.delf{ndrho}(k),x(1),x(2),x(3))-x(3))];  %multiply by 100 to get enough accuracy
-            inputsoln= soln;                               % Dynamic guesses for solving, i.e., previous solution is new initial guess
+%             inputsoln= soln;                               % Dynamic guesses for solving, i.e., previous solution is new initial guess
         elseif get(handles.onelayer,'value')==1
             f3tosolve=@(x) [fharmratio(x(1),x(2),0)-handles.eharmratio(k);...
                 fdissratio(x(1),x(2),0)-handles.edissratio(k)];
             soln=soln(1:2);  % [not sure d1/lam/ phase angle] These are the initial guesses for d1/lam, phi and drho.
-            inputsoln= soln;
+%             inputsoln= soln;
         end
         
         try

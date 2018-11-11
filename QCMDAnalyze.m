@@ -1,8 +1,8 @@
-function varargout = QCMDanalysisGUI(varargin)
+function varargout = QCMDAnalyze(varargin)
 
 % Copyright (C) 2018 Kazi Sadman (Shull Research Group, Northwestern Uni.)
 %
-% This is Version 1 of the GUI "QCMDanalysisGUI"
+% This is Version 1 of the GUI "QCMDAnalyze"
 % Source code: https://github.com/sadmankazi/QCM-D-Analysis-GUI
 % See READ ME for referencing and citation recommendations
 % Bug reporting should be done through GitHub
@@ -20,37 +20,37 @@ function varargout = QCMDanalysisGUI(varargin)
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-% QCMDANALYSISGUI MATLAB code for QCMDanalysisGUI.fig
-%      QCMDANALYSISGUI, by itself, creates a new QCMDANALYSISGUI or raises the existing
+% QCMDANALYZE MATLAB code for QCMDAnalyze.fig
+%      QCMDANALYZE, by itself, creates a new QCMDANALYZE or raises the existing
 %      singleton*.
 %
-%      H = QCMDANALYSISGUI returns the handle to a new QCMDANALYSISGUI or the handle to
+%      H = QCMDANALYZE returns the handle to a new QCMDANALYZE or the handle to
 %      the existing singleton*.
 %
-%      QCMDANALYSISGUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in QCMDANALYSISGUI.M with the given input arguments.
+%      QCMDANALYZE('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in QCMDANALYZE.M with the given input arguments.
 %
-%      QCMDANALYSISGUI('Property','Value',...) creates a new QCMDANALYSISGUI or raises the
+%      QCMDANALYZE('Property','Value',...) creates a new QCMDANALYZE or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before QCMDanalysisGUI_OpeningFcn gets called.  An
+%      applied to the GUI before QCMDAnalyze_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to QCMDanalysisGUI_OpeningFcn via varargin.
+%      stop.  All inputs are passed to QCMDAnalyze_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help QCMDanalysisGUI
+% Edit the above text to modify the response to help QCMDAnalyze
 
-% Last Modified by GUIDE v2.5 01-Oct-2018 11:42:03
+% Last Modified by GUIDE v2.5 10-Nov-2018 22:18:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @QCMDanalysisGUI_OpeningFcn, ...
-    'gui_OutputFcn',  @QCMDanalysisGUI_OutputFcn, ...
+    'gui_OpeningFcn', @QCMDAnalyze_OpeningFcn, ...
+    'gui_OutputFcn',  @QCMDAnalyze_OutputFcn, ...
     'gui_LayoutFcn',  [] , ...
     'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -65,17 +65,17 @@ end
 
 % End initialization code - DO NOT EDIT
 
-% --- Executes just before QCMDanalysisGUI is made visible.
-function QCMDanalysisGUI_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before QCMDAnalyze is made visible.
+function QCMDAnalyze_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to QCMDanalysisGUI (see VARARGIN)
+% varargin   command line arguments to QCMDAnalyze (see VARARGIN)
 
 % set(gcf,'Units','Pixels','Position',get(0,'ScreenSize')) % Make gui full size
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
-% Choose default command line output for QCMDanalysisGUI
+% Choose default command line output for QCMDAnalyze
 handles.output = hObject;
 
 % set(0,'DefaultAxesColorOrder',[0 0 1; 1 0 0; 0 0.5 0])
@@ -92,7 +92,7 @@ guidata(hObject,handles)
 handles.output = hObject;
 
 % --- Outputs from this function are returned to the command line.
-function varargout = QCMDanalysisGUI_OutputFcn(hObject, eventdata, handles)
+function varargout = QCMDAnalyze_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -227,8 +227,8 @@ drhocalc=@(n,df,d1,phi,drho) df.*(zq./(2*n*f1^2))./real(delfstar2layer(n,d1,phi,
 rhodelta=@(n,grho,phi) ((grho.^0.5)./(2*pi.*n.*f1.*sind(phi./2)));
 
 soln=[0.05, 45, 0.001];  % [not sure d1/lam/ phase angle/ Drho] These are the initial guesses for d1/lam, phi and drho.
-lb=[0.01, 0, 1e-7];      % lower bounds on final solution
-ub=[0.25, 90, 0.5];      % upper bounds on final solution
+lb=[0.01, 0, 2e-4];      % lower bounds on final solution
+ub=[0.25, 90, 0.01];     % upper bounds on final solution
 
 inputsoln= soln;
 
@@ -236,7 +236,7 @@ start = str2num(get(handles.startindex,'String'));
 step = str2num(get(handles.stepindex,'String'));
 endidx = str2num(get(handles.endindex,'String'));
 
-options = optimset('display','off','TolFun',10e-8); % Set the solver tolerance
+options = optimset('display','off','TolFun',10e-6); % Set the solver tolerance
 
 for i = 1:i
     
@@ -420,13 +420,34 @@ close(gcbf)
 close all
 clear all
 reset(0)
-QCMDanalysisGUI
+QCMDAnalyze
 clc
 
 
-% --- Executes on button press in simulator.
-function simulator_Callback(hObject, eventdata, handles)
-shiftsimulator;
+% --- Executes on button press in verifysoln.
+function verifysoln_Callback(hObject, eventdata, handles)
+
+if ~isfield(handles,'d1out')
+    set(handles.statusupdate, 'String', 'No solved solutions!','Foregroundcolor','red');
+    return
+end
+
+start = str2num(get(handles.startindex,'String'));
+step = str2num(get(handles.stepindex,'String'));
+endidx = str2num(get(handles.endindex,'String'));
+
+calcprops=figure('units','inches','Position', [2.5, 4, 12, 5]);
+subplot(1,2,1);
+plot(handles.t(start:step:endidx), handles.exitflag{1}(start:step:endidx), 'o')
+xlabel('t (min)');
+ylabel('Solver Exitflag');
+title('3:5,3 Calculation')
+
+subplot(1,2,2);
+plot(handles.t(start:step:endidx), handles.exitflag{2}(start:step:endidx),'o')
+xlabel('t (min)');
+ylabel('Solver Exitflag');
+title('3:5,5 Calculation')
 
 
 % --- Executes on button press in showhandles.
@@ -566,13 +587,13 @@ st = str2num(get(handles.stepindex,'String'));
 e = str2num(get(handles.endindex,'String'));
 
 header={'time (min)','delf1 (Hz)','delg1 (Hz)','delf3','delg3','delf5','delg5',...
-    'dp (mg/m2) 355','rhoG_3 355 (Pa-g/cm3)','phi 355(deg)','d/lambda_3 355','d/lambda_5',...
-    'decay length_3 (um)','decay length_5 (um)','pd/(pd)_s3','delf3pred355','delg3pred355','delf5pred355','delg5pred355'};
+    'dp (mg/m2) 355','rhoG_3 355 (Pa-g/cm3)','phi 355(deg)','d/lambda_3 355','d/lambda_5 355',...
+    'decay length_3 (g/m2)','decay length_5 (g/m2)','pd/(pd)_s3','delf3pred355','delg3pred355','delf5pred355','delg5pred355','Exitflag_355'};
 
 A = [handles.t(s:st:e) handles.delf{1}(s:st:e) handles.delg{1}(s:st:e) handles.delf{3}(s:st:e) handles.delg{3}(s:st:e)...
     handles.delf{5}(s:st:e) handles.delg{5}(s:st:e) 1e6*handles.drhoout{2}' 0.001*handles.grho3out{2}'...
     handles.phiout{2}' handles.d3out' handles.d5out' 1e3*handles.rhodel3out' 1e3*handles.rhodel5out'...
-    (-1./handles.sauerbreycorrection3)' handles.f3pred355' handles.g3pred355' handles.f5pred355' handles.g5pred355'];
+    (-1./handles.sauerbreycorrection3)' handles.f3pred355' handles.g3pred355' handles.f5pred355' handles.g5pred355' handles.exitflag{2}(s:st:e)'];
 
 fileID = fopen('exported_data.txt','w');
 fprintf(fileID, '%s\t', header{:});
@@ -802,4 +823,3 @@ if get(handles.saveplots,'value')==1
     saveas(calcprops,'viscoelastic plots.svg')
 else
 end
-

@@ -135,13 +135,30 @@ data(row, :) = [];
 %Import data into the handle structure:
 handles.t = data(:,1)./60; %Convert seconds to min
 handles.delf{1} = data(:,2);
-handles.delg{1} = 0.5*1*5*data(:,3); %Convert D to Gamma
-
 handles.delf{3} = data(:,4);
-handles.delg{3} = 0.5*3*5*data(:,5);
-
 handles.delf{5} = data(:,6);
-handles.delg{5} = 0.5*5*5*data(:,7);
+
+if get(handles.diss,'value')==1
+    handles.delg{1} = 0.5*1*5*data(:,3); %Convert D to Gamma
+    % handles.delg{1} = data(:,3); %Convert D to Gamma
+    
+    handles.delg{3} = 0.5*3*5*data(:,5);
+    % handles.delg{3} = data(:,5);
+    
+    handles.delg{5} = 0.5*5*5*data(:,7);
+    % handles.delg{5} = data(:,7);
+else
+    handles.delg{1} = data(:,3); %Convert D to Gamma
+    % handles.delg{1} = data(:,3); %Convert D to Gamma
+    
+    handles.delg{3} = data(:,5);
+    % handles.delg{3} = data(:,5);
+    
+    handles.delg{5} = data(:,7);
+    % handles.delg{5} = data(:,7);
+end
+
+
 %handles.temp = data(:,8);  Import new variables here if (temperature for
 %example), put these data into the 8th, 9th columns...
 
@@ -621,6 +638,10 @@ if -handles.delf{1} > handles.delg{1}+100
     return
 end
 
+s = str2num(get(handles.startindex,'String'));
+st = str2num(get(handles.stepindex,'String'));
+e = str2num(get(handles.endindex,'String'));
+
 calcprops=figure('units','inches','Position', [2.5, 4, 12, 5]);
 
 %Calculate phase angle based on bulk limit equations:
@@ -634,7 +655,7 @@ pG3=(handles.delf{3}.*pi.*8.84e6./(5e6.*sind(phi3./2))).^2;
 pG5=(handles.delf{5}.*pi.*8.84e6./(5e6.*sind(phi5./2))).^2;
 
 subplot(1,2,1)
-plot(handles.t,pG3./1000,'o',handles.t,pG5./1000,'x');
+plot(handles.t(s:st:e),pG3(s:st:e)./1000,'o',handles.t(s:st:e),pG5(s:st:e)./1000,'x');
 xlabel('t (min)','fontweight','bold');
 ylabel('\rho|G_n^*| (Pa-g/cm^3)','fontweight','bold');
 title('(a)','fontweight','bold')
@@ -643,7 +664,7 @@ legend('n=3','n=5', 'location','best');
 legend boxoff
 
 subplot(1,2,2)
-plot(handles.t,phi3,'o',handles.t,phi5,'x');
+plot(handles.t(s:st:e),phi3(s:st:e),'o',handles.t(s:st:e),phi5(s:st:e),'x');
 xlabel('t (min)','fontweight','bold');
 ylabel('\phi (Deg.)','fontweight','bold','fontweight','bold');
 title('(b)')
